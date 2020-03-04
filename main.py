@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
 
-L = [('Bob', 75), ('Adam', 92), ('Bart', 66), ('Lisa', 88)]
-def by_name(t):
-    return t[1]
-    pass
-L2 = sorted(L, key = by_name, reverse = True)
-print(L2)
+' a test module '
+__author__ = 'aoaoao'
+
+import sys
+
+def test():
+    args = sys.argv
+    if len(args) == 1:
+        print('Hello, world!')
+    elif len(args) == 2:
+        print('Hello, %s' % args[1])
+    else : print('Too many arguments')
+
+if __name__ == '__main__':
+    test()
