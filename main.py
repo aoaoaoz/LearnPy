@@ -3,34 +3,59 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-class Screen(object):
+class Field(object):
+    def __init__(self, name, column_type):
+        self.name = name
+        self.column_type = column_type
     
-    @property
-    def width(self):
-        return self._width
+    def __str__(self):
+        return '<%s:%s>' % (self.__class__.__name__, self.name)
+class StringField(Field):
+    def __init__(self, name):
+        super(StringField, self).__init__(name, 'varchar(100)')
+class IntegerField(Field):
+    def __init__(self, name):
+        super(IntegerField, self).__init__(name, 'bigint')
+
+class ModelMetaclass(type):
+
+    def __new__(cls, name, bases, attrs):
+        if name == 'Model':
+            return type.__new__(cls, name, bases, attrs)
+        print('Found model: %s' % name)
+        mappings = dict()
+        for k, v in attrs.items():
+            if isinstance(v, Field):
+                print('Found mapping: %s ==> %s' % (k, v))
+                mappings[k] = v
+        for k in mappings.keys():
+            atts.pop(k)
+        attrs['__mappings__'] = mappings
+        attrs['__table__'] = name
+        return type.__new__(cls, name, bases, attrs)
+
+class Model(dict, metaclass = ModelMetaclass):
     
-    @width.setter
-    def width(self, x):
-        if not isinstance(x, int):
-            raise TypeError('sdf')
-        self._width = x
-    @property
-    def height(self):
-        return self._height
+    def __init__(self, **kw):
+        super(Model, self).__init__(**kw)
     
-    @width.setter
-    def height(self, x):
-        if not isinstance(x, int):
-            raise TypeError('sdf')
-        self._height = x
-    @property
-    def resolution(self):
-        return self._width * self._height
-s = Screen()
-s.width = 1024
-s.height = 768
-print('resolution =', s.resolution)
-if s.resolution == 786432:
-    print('测试通过!')
-else:
-    print('测试失败!')
+    def __getattribute__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(r"'Model' object has no attribute '%s'" % key)
+
+    def __setattr__(self, key, value):
+        self[key] = value
+    
+    def save(self):
+        fields = []
+        params = []
+        args = []
+        for k, v in self.__mappings__.items():
+            fields.append(v.name)
+            params.append('?')
+            args.append(getattr(self, k, None))
+        sql = 'insert into %s (%s) value (%s)' % (self.__table__, ','.join(fields), ','.join(params))
+        print('SQL: %s' % sql)
+        print('ARGS: %s' % str(args))
