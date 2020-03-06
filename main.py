@@ -3,21 +3,12 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-import threading
+import re
 
-local_school = threading.local()
+def name_of_email(addr):
+    reg = re.compile(r'^\<*([\w\s]*)\>*([\s\w]*)@(\w+)\.org$')
+    return reg.match(addr).group(1)
 
-def process_student():
-    std = local_school.student
-    print('Hello, %s(in %s)' % (std, threading.current_thread().name))
-
-def process_thread(name):
-    local_school.student = name
-    process_student()
-
-t1 = threading.Thread(target=process_thread, args=('Alice', ))
-t2 = threading.Thread(target=process_thread, args=('Bob', ))
-t1.start()
-t2.start()
-t1.join()
-t2.join()
+assert name_of_email('<Tom Paris> tom@voyager.org') == 'Tom Paris'
+assert name_of_email('tom@voyager.org') == 'tom'
+print('ok')
