@@ -3,27 +3,28 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-from multiprocessing import Process, Queue
-import os, time, random
+import time, threading
 
-def write(q):
-    print('Process to write: %s' % os.getpid())
-    for value in ['A', 'B', 'C']:
-        print('Put %s to queue...' % value)
-        q.put(value)
-        time.sleep(random.random())
+balance = 0
+lock = threading.Lock()
 
-def read(q):
-    print('Process to read: %s' % os.getpid())
-    while True:
-        value = q.get(True)
-        print('Get %s from queue.' % value)
+def change_it(n):
+    global balance
+    balance = balance + n
+    balance = balance - n
 
-if __name__ == '__main__':
-    q = Queue()
-    pw = Process(target=write, args=(q,))
-    pr = Process(target=read, args=(q,))
-    pw.start()
-    pr.start()
-    pw.join()
-    pr.terminate()
+def run_thread(n):
+    for i in range(100000):
+        lock.acquire()
+        try:
+            change_it(n)
+        finally:
+            lock.release()
+
+t1 = threading.Thread(target=run_thread, args=(5, ))
+t2 = threading.Thread(target=run_thread, args=(8, ))
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+print(balance)
