@@ -3,28 +3,21 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-import time, threading
+import threading
 
-balance = 0
-lock = threading.Lock()
+local_school = threading.local()
 
-def change_it(n):
-    global balance
-    balance = balance + n
-    balance = balance - n
+def process_student():
+    std = local_school.student
+    print('Hello, %s(in %s)' % (std, threading.current_thread().name))
 
-def run_thread(n):
-    for i in range(100000):
-        lock.acquire()
-        try:
-            change_it(n)
-        finally:
-            lock.release()
+def process_thread(name):
+    local_school.student = name
+    process_student()
 
-t1 = threading.Thread(target=run_thread, args=(5, ))
-t2 = threading.Thread(target=run_thread, args=(8, ))
+t1 = threading.Thread(target=process_thread, args=('Alice', ))
+t2 = threading.Thread(target=process_thread, args=('Bob', ))
 t1.start()
 t2.start()
 t1.join()
 t2.join()
-print(balance)
