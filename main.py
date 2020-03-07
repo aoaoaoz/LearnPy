@@ -3,22 +3,22 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-import re
-from datetime import datetime, timezone, timedelta
-def to_timestamp(dt_str, tz_str):
-    cday = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
-    reg = re.compile(r'^UTC([\+\-])(\d+)\:00$')
-    x = reg.match(tz_str)
-    if x.group(1)=='-':
-        num = -int(x.group(2))
-    else:
-        num = int(x.group(2))
-    dt = cday.replace(tzinfo=timezone(timedelta(hours=num)))
-    return dt.timestamp()
-t1 = to_timestamp('2015-6-1 08:10:30', 'UTC+7:00')
-assert t1 == 1433121030.0, t1
+import hashlib
 
-t2 = to_timestamp('2015-5-31 16:10:30', 'UTC-09:00')
-assert t2 == 1433121030.0, t2
+db = {
+    'michael': 'e10adc3949ba59abbe56e057f20f883e',
+    'bob': '878ef96e86145580c38c87f0410ad153',
+    'alice': '99b1c2188db85afee403b1536010c2c9'
+}
+def login(user, password):
+    sha1 = hashlib.md5()
+    sha1.update(password.encode('utf-8'))
+    return sha1.hexdigest() == db[user]
 
+assert login('michael', '123456')
+assert login('bob', 'abc999')
+assert login('alice', 'alice2008')
+assert not login('michael', '1234567')
+assert not login('bob', '123456')
+assert not login('alice', 'Alice2008')
 print('ok')
