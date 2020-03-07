@@ -3,27 +3,30 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-import itertools
+from PIL import Image, ImageFilter, ImageDraw, ImageFont
+import random
 
-def pi(N):
-    ' 计算pi的值 '
-    # step 1: 创建一个奇数序列: 1, 3, 5, 7, 9, ...
-    naturals = itertools.count(1, 2)
-    # step 2: 取该序列的前N项: 1, 3, 5, 7, 9, ..., 2*N-1.
-    odd = itertools.takewhile(lambda x: x<=2*N, naturals)
-    # step 3: 添加正负符号并用4除: 4/1, -4/3, 4/5, -4/7, 4/9, ...
-    odd = map( lambda x: 4*(-1)**(x//2)/x, odd)
-    # step 4: 求和:
-    return sum(odd)
+def randChar():
+    return chr(random.randint(0, 26)+ord('a'))
 
+def randColor1():
+    return (random.randint(64, 255), random.randint(64, 255), random.randint(64, 255))
 
-# 测试:
-print(pi(10))
-print(pi(100))
-print(pi(1000))
-print(pi(10000))
-assert 3.04 < pi(10) < 3.05
-assert 3.13 < pi(100) < 3.14
-assert 3.140 < pi(1000) < 3.141
-assert 3.1414 < pi(10000) < 3.1415
-print('ok')
+def randColor2():
+    return (random.randint(32, 127), random.randint(32, 127), random.randint(32, 127))
+
+width = 60 * 4
+height = 60
+img = Image.new('RGB', (width, height), (255, 255, 255))
+font = ImageFont.truetype('C:\Windows\Fonts\Arial.ttf', 36)
+img.show()
+draw = ImageDraw.Draw(img)
+for x in range(width):
+    for y in range(height):
+        draw.point((x, y), fill = randColor1())
+
+for t in range(4):
+    draw.text((60*t+10, 10), randChar(), font = font, fill = randColor2())
+img = img.filter(ImageFilter.BLUR)
+img.show()
+img.save('code.jpg', 'jpeg')
