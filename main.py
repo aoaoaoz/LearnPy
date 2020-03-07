@@ -3,30 +3,25 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-from PIL import Image, ImageFilter, ImageDraw, ImageFont
-import random
+from tkinter import *
+import tkinter.messagebox as messagebox
 
-def randChar():
-    return chr(random.randint(0, 26)+ord('a'))
+class Application(Frame):
+    def __init__(self, master = None):
+        Frame.__init__(self, master)
+        self.pack()
+        self.createWidgets()
+    
+    def createWidgets(self):
+        self.nameInput = Entry(self)
+        self.nameInput.pack()
+        self.alertButton = Button(self, text = 'Hello', command = self.hello)
+        self.alertButton.pack()
 
-def randColor1():
-    return (random.randint(64, 255), random.randint(64, 255), random.randint(64, 255))
+    def hello(self):
+        name = self.nameInput.get() or 'world'
+        messagebox.showinfo('Message', 'Hello, %s' % name)
 
-def randColor2():
-    return (random.randint(32, 127), random.randint(32, 127), random.randint(32, 127))
-
-width = 60 * 4
-height = 60
-img = Image.new('RGB', (width, height), (255, 255, 255))
-font = ImageFont.truetype('C:\Windows\Fonts\Arial.ttf', 36)
-img.show()
-draw = ImageDraw.Draw(img)
-for x in range(width):
-    for y in range(height):
-        draw.point((x, y), fill = randColor1())
-
-for t in range(4):
-    draw.text((60*t+10, 10), randChar(), font = font, fill = randColor2())
-img = img.filter(ImageFilter.BLUR)
-img.show()
-img.save('code.jpg', 'jpeg')
+app = Application()
+app.master.title('Hello, world!')
+app.mainloop()
