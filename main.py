@@ -3,22 +3,27 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-import hashlib
+import itertools
 
-db = {
-    'michael': 'e10adc3949ba59abbe56e057f20f883e',
-    'bob': '878ef96e86145580c38c87f0410ad153',
-    'alice': '99b1c2188db85afee403b1536010c2c9'
-}
-def login(user, password):
-    sha1 = hashlib.md5()
-    sha1.update(password.encode('utf-8'))
-    return sha1.hexdigest() == db[user]
+def pi(N):
+    ' 计算pi的值 '
+    # step 1: 创建一个奇数序列: 1, 3, 5, 7, 9, ...
+    naturals = itertools.count(1, 2)
+    # step 2: 取该序列的前N项: 1, 3, 5, 7, 9, ..., 2*N-1.
+    odd = itertools.takewhile(lambda x: x<=2*N, naturals)
+    # step 3: 添加正负符号并用4除: 4/1, -4/3, 4/5, -4/7, 4/9, ...
+    odd = map( lambda x: 4*(-1)**(x//2)/x, odd)
+    # step 4: 求和:
+    return sum(odd)
 
-assert login('michael', '123456')
-assert login('bob', 'abc999')
-assert login('alice', 'alice2008')
-assert not login('michael', '1234567')
-assert not login('bob', '123456')
-assert not login('alice', 'Alice2008')
+
+# 测试:
+print(pi(10))
+print(pi(100))
+print(pi(1000))
+print(pi(10000))
+assert 3.04 < pi(10) < 3.05
+assert 3.13 < pi(100) < 3.14
+assert 3.140 < pi(1000) < 3.141
+assert 3.1414 < pi(10000) < 3.1415
 print('ok')
