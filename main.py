@@ -3,37 +3,32 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-import os, sqlite3
+def application(environ, start_response):
+    start_response('200 OK', [('Content-Type', 'text/html')])
+    body = '<h1>Hello, %s</h1>' % (environ['PATH_INFO'][1:] or 'web')
+    return [body.encode('utf-8')]
 
-db_file = os.path.join(os.path.dirname(__file__), 'test.db')
-if os.path.isfile(db_file):
-    os.remove(db_file)
+from flask import Flask, request
 
-# 初始数据:
-conn = sqlite3.connect(db_file)
-cursor = conn.cursor()
-cursor.execute('create table user(id varchar(20) primary key, name varchar(20), score int)')
-cursor.execute(r"insert into user values ('A-001', 'Adam', 95)")
-cursor.execute(r"insert into user values ('A-002', 'Bart', 62)")
-cursor.execute(r"insert into user values ('A-003', 'Lisa', 78)")
-cursor.close()
-conn.commit()
-conn.close()
+app = Flask(__name__)
 
-def get_score_in(low, high):
-    ' 返回指定分数区间的名字，按分数从低到高排序 '
-    conn = sqlite3.connect(db_file)
-    cursor = conn.cursor()
-    cursor.execute('select name from user where score <= ? and score >= ?', (high, low))
-    ret = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    ret = list(map(lambda x: x[0], ret))
-    sorted(ret)
-    return ret
-# 测试:
-assert get_score_in(80, 95) == ['Adam'], get_score_in(80, 95)
-assert get_score_in(60, 80) == ['Bart', 'Lisa'], get_score_in(60, 80)
-assert get_score_in(60, 100) == ['Adam', 'Bart', 'Lisa'], get_score_in(60, 100)
+@app.route('/', methods = ['GET', 'POST'])
+def home():
+    return '<h1>Home</h1>'
 
-print('Pass')
+@app.route('/signin', methods = ['GET'])
+def signin_form():
+    return '''<form action="/signin" method="post">
+              <p><input name="username"></p>
+              <p><input name="password" type="password"></p>
+              <p><button type="submit">Sign In</button></p>
+              </form>'''
+
+@app.route('/signin', methods=['POST'])
+def signin():
+    if request.form['username']=='admin' and request.form['password']=='password':
+        return '<h3>Hello, admin!</h3>'
+    return '<h3>Bad username or password.</h3>'
+
+if __name__ == '__main__':
+    app.run()
