@@ -3,25 +3,14 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-from tkinter import *
-import tkinter.messagebox as messagebox
+import socket, time
+from threading import Thread
 
-class Application(Frame):
-    def __init__(self, master = None):
-        Frame.__init__(self, master)
-        self.pack()
-        self.createWidgets()
-    
-    def createWidgets(self):
-        self.nameInput = Entry(self)
-        self.nameInput.pack()
-        self.alertButton = Button(self, text = 'Hello', command = self.hello)
-        self.alertButton.pack()
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind( ('127.0.0.1', 9999) )
 
-    def hello(self):
-        name = self.nameInput.get() or 'world'
-        messagebox.showinfo('Message', 'Hello, %s' % name)
-
-app = Application()
-app.master.title('Hello, world!')
-app.mainloop()
+print ('Bind UDP on 9999...')
+while True:
+    data, addr = s.recvfrom(1024)
+    print('Received from %s:%s.' % addr)
+    s.sendto(b'Hello, %s!' % data, addr)
