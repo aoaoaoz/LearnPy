@@ -4,6 +4,11 @@
 __author__ = 'aoaoao'
 
 import numpy as np
+import numpy.matlib
 
-a = [1.43, 23.342, 2.64, 254.352]
-print( np.around( a, decimals = 1 ) )
+a = np.array([[1, 2], [3, 4]])
+b = np.array([1, 2])
+print(np.linalg.det(a))
+print(np.linalg.solve(a, b))
+b = np.linalg.inv(a)
+print(np.matmul(a, b))
