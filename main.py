@@ -3,12 +3,14 @@
 ' a test module '
 __author__ = 'aoaoao'
 
-import numpy as np
-import numpy.matlib
+import argparse
 
-a = np.array([[1, 2], [3, 4]])
-b = np.array([1, 2])
-print(np.linalg.det(a))
-print(np.linalg.solve(a, b))
-b = np.linalg.inv(a)
-print(np.matmul(a, b))
+parser = argparse.ArgumentParser()
+parser.add_argument('square', type=int, 
+    help='diplay a aquare of a given number')
+parser.add_argument('-v', '--verbose', action='store_true', 
+    help = 'increase output verbosity')
+args = parser.parse_args()
+answer = args.square ** 2
+if args.verbose:
+    print('the square of %s equals %s' % (args.square, answer) )
